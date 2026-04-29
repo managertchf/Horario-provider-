@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horario Providers · Clinicexperts Telehealth</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fafaf7;
+    --bg-soft:#f3f2ed;
+    --panel:#ffffff;
+    --panel-2:#f7f6f1;
+    --line:#e5e2d8;
+    --line-strong:#cfcabd;
+    --ink:#1a1d24;
+    --ink-soft:#5a6275;
+    --ink-dim:#8a93a6;
+    --accent:#2d8c7a;
+    --accent-2:#c47e1f;
+    --provider-cash:#c47e1f;
+    --provider-a:#2d8c7a;
+    --provider-b:#7c5fb5;
+    --nurse:#c4365e;
+    --staff-ordelis:#3d8a4a;
+    --staff-daimel:#3a6db8;
+    --staff-giselle:#b8438a;
+    --staff-tairis:#c4365e;
+    --staff-oak:#b8443e;
+    --staff-fort:#9c6730;
+    --shadow:0 20px 50px -25px rgba(40,30,15,.18);
+    --shadow-soft:0 4px 14px -6px rgba(40,30,15,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);font-family:'Outfit',sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+  body{
+    min-height:100vh;
+    background:radial-gradient(circle at 15% 0%, rgba(45,140,122,.05), transparent 50%),
+               radial-gradient(circle at 85% 100%, rgba(196,126,31,.04), transparent 50%),
+               var(--bg);
+    padding:32px 20px 80px;
+  }
+  .wrap{max-width:1180px;margin:0 auto}
+  header{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1px solid var(--line);padding-bottom:24px;margin-bottom:40px;flex-wrap:wrap;gap:20px}
+  .brand{display:flex;flex-direction:column;gap:4px}
+  .brand-tag{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;color:var(--accent);text-transform:uppercase}
+  .brand h1{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(28px,4vw,44px);letter-spacing:-.02em;line-height:1.05;color:var(--ink)}
+  .brand h1 em{font-style:italic;font-weight:400;color:var(--accent)}
+  .clock{text-align:right;font-family:'JetBrains Mono',monospace;color:var(--ink-soft);font-size:13px;line-height:1.7}
+  .clock strong{color:var(--ink);display:block;font-size:15px;font-weight:600;text-transform:capitalize}
+
+  .today{
+    background:linear-gradient(135deg,var(--panel) 0%,var(--panel-2) 100%);
+    border:1px solid var(--line);border-radius:24px;padding:36px 40px;
+    box-shadow:var(--shadow);margin-bottom:48px;position:relative;overflow:hidden;
+  }
+  .today::before{content:"";position:absolute;top:-50%;right:-10%;width:50%;height:200%;background:radial-gradient(circle,rgba(45,140,122,.06),transparent 60%);pointer-events:none}
+  .today-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;position:relative}
+  .today-label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:10px}
+  .pulse{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 0 var(--accent);animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(45,140,122,.5)}70%{box-shadow:0 0 0 12px rgba(45,140,122,0)}100%{box-shadow:0 0 0 0 rgba(45,140,122,0)}}
+  .week-pills{display:flex;gap:8px;flex-wrap:wrap}
+  .week-pill{
+    background:rgba(196,126,31,.10);border:1px solid rgba(196,126,31,.3);
+    color:var(--accent-2);padding:6px 14px;border-radius:100px;
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;
+  }
+  .week-pill.nurse{background:rgba(196,54,94,.08);border-color:rgba(196,54,94,.3);color:var(--nurse)}
+  .today-day{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(36px,5vw,56px);letter-spacing:-.02em;text-transform:capitalize;line-height:1;margin-bottom:6px;position:relative;color:var(--ink)}
+  .today-date{color:var(--ink-soft);font-size:14px;margin-bottom:28px;position:relative}
+  .today-providers{display:grid;gap:16px;position:relative}
+
+  .provider-card{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:20px 24px;display:flex;justify-content:space-between;align-items:center;
+    transition:transform .25s,border-color .25s,box-shadow .25s;flex-wrap:wrap;gap:12px;
+    box-shadow:var(--shadow-soft);
+  }
+  .provider-card:hover{transform:translateX(4px);border-color:var(--line-strong);box-shadow:0 6px 20px -8px rgba(40,30,15,.12)}
+  .provider-card.is-nurse{
+    background:linear-gradient(90deg,rgba(196,54,94,.05),var(--panel));
+    border-color:rgba(196,54,94,.25);
+  }
+  .provider-card.is-nurse:hover{border-color:var(--nurse)}
+  .provider-name{display:flex;align-items:center;gap:14px}
+  .provider-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0}
+  .provider-cash .provider-dot{background:var(--provider-cash);box-shadow:0 0 12px rgba(196,126,31,.35)}
+  .provider-a .provider-dot{background:var(--provider-a);box-shadow:0 0 12px rgba(45,140,122,.35)}
+  .provider-b .provider-dot{background:var(--provider-b);box-shadow:0 0 12px rgba(124,95,181,.35)}
+  .provider-nurse .provider-dot{background:var(--nurse);box-shadow:0 0 12px rgba(196,54,94,.35)}
+  .provider-meta{display:flex;flex-direction:column;gap:2px}
+  .provider-title{font-family:'Fraunces',serif;font-size:22px;font-weight:400;letter-spacing:-.01em;color:var(--ink)}
+  .provider-role{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-dim)}
+  .staff-list{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .staff-chip{
+    background:var(--bg-soft);border:1px solid var(--line);
+    padding:6px 12px;border-radius:100px;font-size:12px;font-weight:500;
+    display:flex;align-items:center;gap:6px;color:var(--ink);
+  }
+  .staff-chip::before{content:"";width:6px;height:6px;border-radius:50%}
+  .staff-chip.ordelis::before{background:var(--staff-ordelis)}
+  .staff-chip.daimel::before{background:var(--staff-daimel)}
+  .staff-chip.giselle::before{background:var(--staff-giselle)}
+  .staff-chip.tairis::before{background:var(--staff-tairis)}
+  .staff-chip.oak::before{background:var(--staff-oak)}
+  .staff-chip.fort::before{background:var(--staff-fort)}
+
+  .ordelis-note,.procedures-note{
+    margin-top:14px;padding:14px 18px;border-radius:8px;
+    font-size:13px;line-height:1.55;width:100%;
+  }
+  .ordelis-note{
+    background:rgba(196,126,31,.06);border:1px solid rgba(196,126,31,.25);
+    border-left:3px solid var(--accent-2);color:var(--ink-soft);
+  }
+  .ordelis-note strong{color:var(--accent-2);font-weight:600}
+  .ordelis-note em{color:var(--ink);font-style:normal;font-weight:600}
+
+  .procedures-note{
+    background:rgba(45,140,122,.06);border:1px solid rgba(45,140,122,.25);
+    border-left:3px solid var(--accent);color:var(--ink-soft);
+  }
+  .procedures-note strong{color:var(--accent);font-weight:600}
+  .procedures-note .proc-tag{
+    display:inline-block;background:rgba(45,140,122,.12);color:var(--accent);
+    padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;
+    margin:0 2px;letter-spacing:.03em;
+  }
+
+  .empty-day{color:var(--ink-dim);font-style:italic;font-size:14px}
+  .section-title{display:flex;align-items:baseline;gap:16px;margin-bottom:24px}
+  .section-title h2{font-family:'Fraunces',serif;font-weight:300;font-size:32px;letter-spacing:-.02em;color:var(--ink)}
+  .section-title h2 em{font-style:italic;color:var(--accent)}
+  .section-title .subline{flex:1;height:1px;background:var(--line)}
+  .section-title .meta{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-dim);letter-spacing:.1em;text-transform:uppercase}
+
+  .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:56px}
+  .day-card{
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:16px 14px;min-height:200px;display:flex;flex-direction:column;
+    transition:border-color .2s,transform .2s,box-shadow .2s;box-shadow:var(--shadow-soft);
+  }
+  .day-card.is-today{
+    border-color:var(--accent);background:linear-gradient(180deg,rgba(45,140,122,.05),var(--panel));
+    box-shadow:0 0 0 1px var(--accent),0 8px 20px -10px rgba(45,140,122,.25);
+  }
+  .day-card:hover:not(.is-today){border-color:var(--line-strong)}
+  .day-name{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:4px}
+  .day-card.is-today .day-name{color:var(--accent)}
+  .day-num{font-family:'Fraunces',serif;font-size:28px;font-weight:300;letter-spacing:-.02em;line-height:1;margin-bottom:14px;color:var(--ink)}
+  .day-providers{display:flex;flex-direction:column;gap:8px;flex:1}
+  .day-provider{
+    background:var(--bg-soft);border-radius:8px;padding:8px 10px;font-size:11px;
+    border-left:3px solid;
+  }
+  .day-provider.cash{border-color:var(--provider-cash)}
+  .day-provider.a{border-color:var(--provider-a)}
+  .day-provider.b{border-color:var(--provider-b)}
+  .day-provider.nurse{border-color:var(--nurse);background:linear-gradient(90deg,rgba(196,54,94,.07),var(--bg-soft))}
+  .dp-name{font-weight:600;font-size:11px;margin-bottom:2px;letter-spacing:.02em;color:var(--ink)}
+  .dp-staff{color:var(--ink-soft);font-size:10.5px;line-height:1.3}
+  .dp-procedures{
+    margin-top:4px;font-size:9.5px;color:var(--accent);font-weight:600;
+    letter-spacing:.04em;text-transform:uppercase;
+  }
+
+  .lookup{
+    background:var(--panel);border:1px solid var(--line);border-radius:20px;
+    padding:32px;margin-bottom:48px;box-shadow:var(--shadow-soft);
+  }
+  .lookup-row{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap}
+  .lookup-input{flex:1;min-width:240px}
+  .lookup-input label{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:8px}
+  .lookup-input input{
+    width:100%;background:var(--bg);border:1px solid var(--line);
+    color:var(--ink);font-family:'Outfit',sans-serif;font-size:18px;
+    padding:14px 18px;border-radius:12px;outline:none;transition:border-color .2s;
+  }
+  .lookup-input input:focus{border-color:var(--accent)}
+  .lookup-result{margin-top:24px;padding-top:24px;border-top:1px solid var(--line);display:none;animation:fadein .3s ease}
+  .lookup-result.shown{display:block}
+  @keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .result-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px;flex-wrap:wrap;gap:8px}
+  .result-day{font-family:'Fraunces',serif;font-size:26px;font-weight:300;text-transform:capitalize;color:var(--ink)}
+  .result-meta{display:flex;gap:8px;flex-wrap:wrap}
+  .result-providers{display:grid;gap:10px}
+
+  .legend{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px 28px;
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:24px;box-shadow:var(--shadow-soft);
+  }
+  .legend-group{flex:1;min-width:240px}
+  .legend-group h3{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:12px;font-weight:400}
+  .legend-items{display:flex;gap:8px;flex-wrap:wrap}
+
+  footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--line);color:var(--ink-dim);font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  footer .mono{font-family:'JetBrains Mono',monospace}
+
+  @media (max-width:900px){.week-grid{grid-template-columns:repeat(3,1fr)}}
+  @media (max-width:600px){body{padding:20px 14px 60px}.today{padding:24px 22px;border-radius:18px}.week-grid{grid-template-columns:repeat(2,1fr)}.lookup{padding:22px}.provider-card{padding:16px 18px}.provider-title{font-size:18px}}
+  @media (max-width:420px){.week-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <span class="brand-tag">Clinicexperts · Telehealth</span>
+      <h1>Horario <em>Providers</em></h1>
+    </div>
+    <div class="clock">
+      <strong id="clock-day">—</strong>
+      <span id="clock-date">—</span><br>
+      <span id="clock-time">—</span>
+    </div>
+  </header>
+
+  <section class="today">
+    <div class="today-head">
+      <span class="today-label"><span class="pulse"></span> Hoy</span>
+      <div class="week-pills">
+        <span class="week-pill" id="today-week">Semana —</span>
+        <span class="week-pill nurse" id="today-nurse-week" style="display:none">RN —</span>
+      </div>
+    </div>
+    <h2 class="today-day" id="today-day-name">—</h2>
+    <p class="today-date" id="today-full-date">—</p>
+    <div class="today-providers" id="today-providers"></div>
+  </section>
+
+  <div class="section-title">
+    <h2>Esta <em>semana</em></h2>
+    <div class="subline"></div>
+    <span class="meta" id="week-range">—</span>
+  </div>
+  <div class="week-grid" id="week-grid"></div>
+
+  <div class="section-title">
+    <h2>Consultar <em>fecha</em></h2>
+    <div class="subline"></div>
+    <span class="meta">Cualquier día futuro</span>
+  </div>
+  <section class="lookup">
+    <div class="lookup-row">
+      <div class="lookup-input">
+        <label for="date-picker">Selecciona una fecha</label>
+        <input type="date" id="date-picker">
+      </div>
+    </div>
+    <div class="lookup-result" id="lookup-result">
+      <div class="result-head">
+        <span class="result-day" id="result-day">—</span>
+        <span class="result-meta" id="result-meta">—</span>
+      </div>
+      <div class="result-providers" id="result-providers"></div>
+    </div>
+  </section>
+
+  <div class="section-title">
+    <h2>Leyenda</h2>
+    <div class="subline"></div>
+  </div>
+  <div class="legend">
+    <div class="legend-group">
+      <h3>Providers / RN</h3>
+      <div class="legend-items">
+        <span class="staff-chip" style="border-color:var(--provider-cash)"><span style="width:8px;height:8px;border-radius:50%;background:var(--provider-cash);display:inline-block"></span>PROVIDER CASH</span>
+        <span class="staff-chip" style="border-color:var(--provider-a)"><span style="width:8px;height:8px;border-radius:50%;background:var(--provider-a);display:inline-block"></span>PROVIDER Insurance A</span>
+        <span class="staff-chip" style="border-color:var(--provider-b)"><span style="width:8px;height:8px;border-radius:50%;background:var(--provider-b);display:inline-block"></span>PROVIDER Insurance B</span>
+        <span class="staff-chip" style="border-color:var(--nurse)"><span style="width:8px;height:8px;border-radius:50%;background:var(--nurse);display:inline-block"></span>RN — Tairis Rodríguez</span>
+      </div>
+    </div>
+    <div class="legend-group">
+      <h3>Staff & Sedes</h3>
+      <div class="legend-items">
+        <span class="staff-chip ordelis">ORDELIS MONTEJO</span>
+        <span class="staff-chip daimel">DAIMEL PEREZ</span>
+        <span class="staff-chip giselle">GISELLE CABEZAS</span>
+        <span class="staff-chip tairis">TAIRIS RODRÍGUEZ</span>
+        <span class="staff-chip oak">Oakcliff</span>
+        <span class="staff-chip fort">Fort Worth</span>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span>Datos sincronizados desde Notion · Providers ciclo 4 semanas · RN ciclo 2 semanas</span>
+    <span class="mono" id="cycle-info">—</span>
+  </footer>
+</div>
+
+<script>
+/* DATA — Providers (4 semanas) */
+const SCHEDULE = {
+  1: {
+    "PROVIDER CASH":        { Mon:["Oak"],     Tue:["Fort W"], Wed:["Oak"],     Thu:["ORDELIS MONTEJO"], Fri:["ORDELIS MONTEJO"], Sat:["ORDELIS MONTEJO"], Sun:["ORDELIS MONTEJO"] },
+    "PROVIDER Insurance A": { Mon:["DAIMEL PEREZ"],   Tue:["GISELLE CABEZAS"], Wed:["DAIMEL PEREZ"],   Thu:["GISELLE CABEZAS"], Fri:["DAIMEL PEREZ"],   Sat:["GISELLE CABEZAS"], Sun:["GISELLE CABEZAS"] },
+    "PROVIDER Insurance B": { Mon:["GISELLE CABEZAS"],Tue:["DAIMEL PEREZ"],   Wed:["GISELLE CABEZAS"],Thu:["DAIMEL PEREZ"],   Fri:["GISELLE CABEZAS"],Sat:[],                  Sun:[] }
+  },
+  2: {
+    "PROVIDER CASH":        { Mon:["Fort W"], Tue:["Oak"],     Wed:["Fort W"], Thu:["ORDELIS MONTEJO"], Fri:["ORDELIS MONTEJO"], Sat:[],                  Sun:[] },
+    "PROVIDER Insurance A": { Mon:["GISELLE CABEZAS"], Tue:["DAIMEL PEREZ"],   Wed:["GISELLE CABEZAS"], Thu:["DAIMEL PEREZ"],   Fri:["GISELLE CABEZAS"], Sat:["DAIMEL PEREZ"],   Sun:["DAIMEL PEREZ"] },
+    "PROVIDER Insurance B": { Mon:["DAIMEL PEREZ"],   Tue:["GISELLE CABEZAS"], Wed:["DAIMEL PEREZ"],   Thu:["GISELLE CABEZAS"], Fri:["DAIMEL PEREZ"],   Sat:[],                  Sun:[] }
+  },
+  3: {
+    "PROVIDER CASH":        { Mon:["Oak"],   Tue:["Fort W"], Wed:["Oak"],   Thu:["ORDELIS MONTEJO"], Fri:["ORDELIS MONTEJO"], Sat:[],                  Sun:[] },
+    "PROVIDER Insurance A": { Mon:["DAIMEL PEREZ"], Tue:["GISELLE CABEZAS"], Wed:["DAIMEL PEREZ"], Thu:["GISELLE CABEZAS"], Fri:["DAIMEL PEREZ"],   Sat:["GISELLE CABEZAS"], Sun:["GISELLE CABEZAS"] },
+    "PROVIDER Insurance B": { Mon:["GISELLE CABEZAS"], Tue:["DAIMEL PEREZ"], Wed:["GISELLE CABEZAS"], Thu:["DAIMEL PEREZ"],   Fri:["GISELLE CABEZAS"], Sat:[],                  Sun:[] }
+  },
+  4: {
+    "PROVIDER CASH":        { Mon:["Fort W"], Tue:["Oak"],   Wed:["Fort W"], Thu:["ORDELIS MONTEJO"], Fri:["ORDELIS MONTEJO"], Sat:["ORDELIS MONTEJO"], Sun:["ORDELIS MONTEJO"] },
+    "PROVIDER Insurance A": { Mon:["GISELLE CABEZAS"], Tue:["DAIMEL PEREZ"],   Wed:["GISELLE CABEZAS"], Thu:["DAIMEL PEREZ"],   Fri:["GISELLE CABEZAS"], Sat:["DAIMEL PEREZ"],   Sun:["DAIMEL PEREZ"] },
+    "PROVIDER Insurance B": { Mon:["DAIMEL PEREZ"],   Tue:["GISELLE CABEZAS"], Wed:["DAIMEL PEREZ"],   Thu:["GISELLE CABEZAS"], Fri:["DAIMEL PEREZ"],   Sat:[],                  Sun:[] }
+  }
+};
+
+/* DATA — Tairis (RN) ciclo de 2 semanas alternadas */
+const NURSE_SCHEDULE = {
+  A: { Mon:true,  Tue:false, Wed:true,  Thu:false, Fri:false, Sat:true,  Sun:true  },
+  B: { Mon:false, Tue:true,  Wed:false, Thu:true,  Fri:true,  Sat:false, Sun:false }
+};
+
+const CYCLE_START = new Date(2026, 3, 27);
+const NURSE_START = new Date(2026, 3, 27);
+
+const DAY_KEYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const DAY_NAMES_ES = {Sun:'Domingo',Mon:'Lunes',Tue:'Martes',Wed:'Miércoles',Thu:'Jueves',Fri:'Viernes',Sat:'Sábado'};
+const DAY_NAMES_ES_SHORT = {Sun:'Dom',Mon:'Lun',Tue:'Mar',Wed:'Mié',Thu:'Jue',Fri:'Vie',Sat:'Sáb'};
+const MONTHS_ES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const PROVIDER_KEYS = {"PROVIDER CASH":"cash","PROVIDER Insurance A":"a","PROVIDER Insurance B":"b"};
+const STAFF_KEYS = {"ORDELIS MONTEJO":"ordelis","DAIMEL PEREZ":"daimel","GISELLE CABEZAS":"giselle","TAIRIS RODRÍGUEZ":"tairis","Oak":"oak","Oakcliff":"oak","Fort W":"fort","Fort Worth":"fort"};
+const SEDE_NAME = {"Oak":"Oakcliff","Fort W":"Fort Worth"};
+
+// Orden fijo: CASH, A, B, luego Tairis (RN) al final
+const PROVIDER_ORDER = ["PROVIDER CASH", "PROVIDER Insurance A", "PROVIDER Insurance B"];
+
+function startOfDay(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate())}
+function daysBetween(a,b){return Math.floor((startOfDay(b)-startOfDay(a))/86400000)}
+function dayKey(date){return DAY_KEYS[date.getDay()]}
+function getCycleWeek(date){
+  const diff = daysBetween(CYCLE_START, date);
+  const wi = Math.floor(diff / 7);
+  return ((wi % 4) + 4) % 4 + 1;
+}
+function getNurseWeek(date){
+  const diff = daysBetween(NURSE_START, date);
+  const wi = Math.floor(diff / 7);
+  return ((wi % 2) + 2) % 2 === 0 ? 'A' : 'B';
+}
+function getMondayOf(date){
+  const d = startOfDay(date);
+  const dow = d.getDay();
+  const offset = dow === 0 ? -6 : 1 - dow;
+  d.setDate(d.getDate() + offset);
+  return d;
+}
+function fmtDateLong(d){return `${d.getDate()} de ${MONTHS_ES[d.getMonth()]} de ${d.getFullYear()}`}
+function fmtDateShort(d){return `${d.getDate()} ${MONTHS_ES[d.getMonth()].slice(0,3)}`}
+function isSede(name){return name === "Oak" || name === "Fort W"}
+function expandSede(name){return SEDE_NAME[name] || name}
+
+function getProvidersFor(date){
+  const week = getCycleWeek(date);
+  const dk = dayKey(date);
+  const result = [];
+  // 1. CASH, A, B en ese orden
+  for (const providerName of PROVIDER_ORDER){
+    const staff = SCHEDULE[week][providerName][dk] || [];
+    if (staff.length > 0){
+      result.push({ provider: providerName, staff });
+    }
+  }
+  // 2. Tairis al FINAL (debajo del Provider B)
+  const nurseWeek = getNurseWeek(date);
+  if (NURSE_SCHEDULE[nurseWeek][dk]){
+    result.push({
+      provider: "TAIRIS RODRÍGUEZ",
+      staff: ["TAIRIS RODRÍGUEZ"],
+      isNurse: true
+    });
+  }
+  return { week, nurseWeek, providers: result };
+}
+
+// ¿Ordelis está físicamente en una sede hoy?
+function ordelisAtSede(date){
+  const week = getCycleWeek(date);
+  const dk = dayKey(date);
+  const cashStaff = SCHEDULE[week]["PROVIDER CASH"][dk] || [];
+  const sede = cashStaff.find(isSede);
+  return sede ? expandSede(sede) : null;
+}
+
+function renderClock(){
+  const now = new Date();
+  document.getElementById('clock-day').textContent = DAY_NAMES_ES[dayKey(now)];
+  document.getElementById('clock-date').textContent = fmtDateLong(now);
+  document.getElementById('clock-time').textContent = now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+}
+function staffChip(staff){
+  const display = isSede(staff) ? expandSede(staff) : staff;
+  const k = STAFF_KEYS[staff] || STAFF_KEYS[display] || 'ordelis';
+  return `<span class="staff-chip ${k}">${display}</span>`;
+}
+
+function renderProviderCard(p, withNote, ctx){
+  const cls = p.isNurse ? 'nurse' : PROVIDER_KEYS[p.provider];
+  const nurseClass = p.isNurse ? 'is-nurse' : '';
+  const role = p.isNurse ? `<div class="provider-role">Enfermera Registrada · Fort Worth</div>` : '';
+  const staffHtml = p.staff.map(staffChip).join('');
+
+  let note = '';
+  if (withNote){
+    // Nota Ordelis cuando está en sede física
+    if (p.provider === 'PROVIDER CASH' && p.staff.some(isSede)){
+      const sede = expandSede(p.staff.find(isSede));
+      note += `
+        <div class="ordelis-note">
+          <strong>⚠️ Nota:</strong> <em>Ordelis Montejo</em> está atendiendo en sede <strong>${sede}</strong> y solo ve <em>pacientes de esa sede</em>.
+          Las prescripciones de otras sedes deben enviarse a <strong>Provider Insurance A</strong>;
+          si no responde, a <strong>Provider Insurance B</strong>.
+          En seguros de otras sedes, el orden A/B varía según los seguros que cada uno cubre.
+        </div>`;
+      // Como Ordelis está físicamente en sede → procedimientos disponibles ese día
+      note += `
+        <div class="procedures-note">
+          <strong>🩺 Procedimientos disponibles hoy en ${sede}:</strong>
+          se pueden agendar con <em style="color:var(--ink);font-style:normal;font-weight:600">Ordelis Montejo</em>:
+          <span class="proc-tag">IV</span><span class="proc-tag">NAD</span><span class="proc-tag">Papanicolaou</span>
+        </div>`;
+    }
+    // Nota Tairis: cuando está activa también se pueden agendar procedimientos
+    if (p.isNurse){
+      note += `
+        <div class="procedures-note">
+          <strong>🩺 Procedimientos disponibles hoy en Fort Worth:</strong>
+          se pueden agendar con <em style="color:var(--ink);font-style:normal;font-weight:600">Tairis Rodríguez (RN)</em>:
+          <span class="proc-tag">IV</span><span class="proc-tag">NAD</span><span class="proc-tag">Papanicolaou</span>
+        </div>`;
+    }
+  }
+  return `
+    <div class="provider-card provider-${cls} ${nurseClass}">
+      <div class="provider-name">
+        <span class="provider-dot"></span>
+        <div class="provider-meta">
+          <span class="provider-title">${p.provider}</span>
+          ${role}
+        </div>
+      </div>
+      <div class="staff-list">${staffHtml}</div>
+      ${note}
+    </div>`;
+}
+
+function renderToday(){
+  const now = new Date();
+  const { week, nurseWeek, providers } = getProvidersFor(now);
+  document.getElementById('today-week').textContent = `Semana ${week} · providers`;
+  const nurseActive = providers.some(p => p.isNurse);
+  const nursePill = document.getElementById('today-nurse-week');
+  if (nurseActive){
+    nursePill.textContent = `RN Sem ${nurseWeek}`;
+    nursePill.style.display = 'inline-block';
+  } else {
+    nursePill.style.display = 'none';
+  }
+  document.getElementById('today-day-name').textContent = DAY_NAMES_ES[dayKey(now)];
+  document.getElementById('today-full-date').textContent = fmtDateLong(now);
+  const cont = document.getElementById('today-providers');
+  if (providers.length === 0){
+    cont.innerHTML = `<div class="provider-card"><span class="empty-day">No hay providers asignados hoy</span></div>`;
+    return;
+  }
+  cont.innerHTML = providers.map(p => renderProviderCard(p, true)).join('');
+}
+
+function renderWeek(){
+  const now = new Date();
+  const monday = getMondayOf(now);
+  const grid = document.getElementById('week-grid');
+  const order = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  let html = '';
+  const todayDate = startOfDay(now).getTime();
+  for (let i = 0; i < 7; i++){
+    const d = new Date(monday); d.setDate(monday.getDate() + i);
+    const isToday = startOfDay(d).getTime() === todayDate;
+    const { providers } = getProvidersFor(d);
+    const dk = order[i];
+    const sedeOrdelis = ordelisAtSede(d);
+    const tairisActive = providers.some(p => p.isNurse);
+
+    let providersHtml = '';
+    if (providers.length === 0){
+      providersHtml = `<div class="empty-day">— sin actividad —</div>`;
+    } else {
+      providersHtml = providers.map(p => {
+        const cls = p.isNurse ? 'nurse' : PROVIDER_KEYS[p.provider];
+        let shortName, staffLine, procLine = '';
+        if (p.isNurse){
+          shortName = '🩺 Tairis (RN)';
+          staffLine = 'Fort Worth';
+          procLine = '<div class="dp-procedures">+ IV · NAD · Pap</div>';
+        } else {
+          shortName = p.provider.replace('PROVIDER ', '');
+          staffLine = p.staff.map(s => isSede(s) ? expandSede(s) : s.split(' ')[0]).join(' · ');
+          // Si es CASH y hay sede → Ordelis físico → procedimientos
+          if (p.provider === 'PROVIDER CASH' && p.staff.some(isSede)){
+            procLine = '<div class="dp-procedures">+ IV · NAD · Pap</div>';
+          }
+        }
+        return `
+          <div class="day-provider ${cls}">
+            <div class="dp-name">${shortName}</div>
+            <div class="dp-staff">${staffLine}</div>
+            ${procLine}
+          </div>`;
+      }).join('');
+    }
+    html += `
+      <div class="day-card ${isToday ? 'is-today' : ''}">
+        <div class="day-name">${DAY_NAMES_ES_SHORT[dk]}</div>
+        <div class="day-num">${d.getDate()}</div>
+        <div class="day-providers">${providersHtml}</div>
+      </div>`;
+  }
+  grid.innerHTML = html;
+  const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
+  document.getElementById('week-range').textContent = `${fmtDateShort(monday)} – ${fmtDateShort(sunday)}`;
+}
+
+function renderLookup(dateStr){
+  const result = document.getElementById('lookup-result');
+  if (!dateStr){ result.classList.remove('shown'); return; }
+  const [y,m,day] = dateStr.split('-').map(Number);
+  const d = new Date(y, m-1, day);
+  const { week, nurseWeek, providers } = getProvidersFor(d);
+  document.getElementById('result-day').textContent = `${DAY_NAMES_ES[dayKey(d)]}, ${fmtDateLong(d)}`;
+  const nurseActive = providers.some(p => p.isNurse);
+  document.getElementById('result-meta').innerHTML =
+    `<span class="week-pill">Semana ${week}</span>${nurseActive ? `<span class="week-pill nurse">RN Sem ${nurseWeek}</span>` : ''}`;
+  const cont = document.getElementById('result-providers');
+  if (providers.length === 0){
+    cont.innerHTML = `<div class="provider-card"><span class="empty-day">No hay providers asignados ese día</span></div>`;
+  } else {
+    cont.innerHTML = providers.map(p => renderProviderCard(p, true)).join('');
+  }
+  result.classList.add('shown');
+}
+
+function renderCycleInfo(){
+  const sd = CYCLE_START;
+  const pad = n => n.toString().padStart(2,'0');
+  document.getElementById('cycle-info').textContent = `Anclaje: ${pad(sd.getDate())}/${pad(sd.getMonth()+1)}/${sd.getFullYear()}`;
+}
+
+function init(){
+  renderClock();
+  renderToday();
+  renderWeek();
+  renderCycleInfo();
+  setInterval(renderClock, 30000);
+  document.getElementById('date-picker').addEventListener('input', e => renderLookup(e.target.value));
+  const now = new Date();
+  const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1, 0, 0, 5);
+  setTimeout(() => { renderToday(); renderWeek(); renderClock(); }, tomorrow - now);
+}
+init();
+</script>
+</body>
+</html>
