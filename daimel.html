@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Horario Daimel Perez</title>
+<style>
+:root{--bg:#f7f4ec;--card:#fff;--ink:#151923;--muted:#657083;--line:#ded7c9;--main:#2f66b3;--alt:#b83f83;--green:#23786a;--shadow:0 18px 45px rgba(27,25,20,.12)}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:radial-gradient(circle at top left,rgba(47,102,179,.14),transparent 38%),var(--bg);color:var(--ink);padding:24px}main{max-width:1040px;margin:0 auto}.nav{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:22px}.nav a{color:var(--ink);text-decoration:none;font-weight:700}.pill{border:1px solid var(--line);border-radius:999px;padding:9px 13px;background:#fff}.hero{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:30px;box-shadow:var(--shadow);margin-bottom:24px}.tag{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--main);font-weight:700}.hero h1{font-size:clamp(34px,7vw,62px);line-height:1;margin:10px 0}.meta{color:var(--muted);font-size:17px}.today{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;margin-top:22px;padding:20px;border-radius:20px;background:#f4f7fc;border:1px solid #d8e2f2}.today h2{margin:0 0 6px;font-size:28px}.status{font-weight:800;color:var(--main);font-size:20px}.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}.day{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;min-height:154px;box-shadow:0 7px 18px rgba(27,25,20,.06)}.day.now{border-color:var(--main);box-shadow:0 0 0 2px rgba(47,102,179,.18),0 7px 18px rgba(27,25,20,.08)}.name{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:800}.num{font-size:30px;font-weight:800;margin:8px 0 16px}.shift{border-left:5px solid var(--main);background:#f4f7fc;border-radius:10px;padding:10px;font-weight:800}.off{color:var(--muted);font-style:italic}.foot{margin-top:22px;color:var(--muted);font-size:13px}@media(max-width:850px){.grid{grid-template-columns:repeat(2,1fr)}.today{grid-template-columns:1fr}}@media(max-width:430px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+  <div class="nav"><a class="pill" href="./index.html">← Todos los horarios</a><a class="pill" href="./giselle.html">Ver Giselle</a></div>
+  <section class="hero">
+    <div class="tag">Horario independiente</div>
+    <h1>Daimel Perez</h1>
+    <p class="meta" id="dateLine">Cargando...</p>
+    <div class="today"><div><h2 id="todayName">Hoy</h2><p class="meta" id="todayDate">—</p></div><div class="status" id="todayStatus">—</div></div>
+  </section>
+  <section class="grid" id="grid"></section>
+  <p class="foot" id="foot">—</p>
+</main>
+<script>
+const PROVIDER='DAIMEL PEREZ';
+const SCHEDULE={1:{Mon:{A:'DAIMEL PEREZ',B:'GISELLE CABEZAS'},Tue:{A:'GISELLE CABEZAS',B:'DAIMEL PEREZ'},Wed:{A:'DAIMEL PEREZ',B:'GISELLE CABEZAS'},Thu:{A:'GISELLE CABEZAS',B:'DAIMEL PEREZ'},Fri:{A:'DAIMEL PEREZ',B:'GISELLE CABEZAS'},Sat:{A:'GISELLE CABEZAS',B:null},Sun:{A:'GISELLE CABEZAS',B:null}},2:{Mon:{A:'GISELLE CABEZAS',B:'DAIMEL PEREZ'},Tue:{A:'DAIMEL PEREZ',B:'GISELLE CABEZAS'},Wed:{A:'GISELLE CABEZAS',B:'DAIMEL PEREZ'},Thu:{A:'DAIMEL PEREZ',B:'GISELLE CABEZAS'},Fri:{A:'GISELLE CABEZAS',B:'DAIMEL PEREZ'},Sat:{A:'DAIMEL PEREZ',B:null},Sun:{A:'DAIMEL PEREZ',B:null}}};
+const CYCLE_START=new Date(2026,3,27),DAY_KEYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],ORDER=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const N={Sun:'Domingo',Mon:'Lunes',Tue:'Martes',Wed:'Miércoles',Thu:'Jueves',Fri:'Viernes',Sat:'Sábado'},NS={Sun:'Dom',Mon:'Lun',Tue:'Mar',Wed:'Mié',Thu:'Jue',Fri:'Vie',Sat:'Sáb'},M=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+function sod(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate())}function diff(a,b){return Math.floor((sod(b)-sod(a))/86400000)}function dk(d){return DAY_KEYS[d.getDay()]}function cw(d){const w=Math.floor(diff(CYCLE_START,d)/7);return((w%2)+2)%2+1}function mon(d){const x=sod(d),o=x.getDay()===0?-6:1-x.getDay();x.setDate(x.getDate()+o);return x}function long(d){return d.getDate()+' de '+M[d.getMonth()]+' de '+d.getFullYear()}function short(d){return d.getDate()+' '+M[d.getMonth()].slice(0,3)}function slot(d){const s=SCHEDULE[cw(d)][dk(d)]||{};if(s.A===PROVIDER)return'Opción A';if(s.B===PROVIDER)return'Opción B';return'Descanso'}
+function render(){const now=new Date(),m=mon(now),today=sod(now).getTime();document.getElementById('dateLine').textContent='Semana '+cw(now)+' · '+long(now);document.getElementById('todayName').textContent=N[dk(now)];document.getElementById('todayDate').textContent=long(now);document.getElementById('todayStatus').textContent=slot(now);let html='';for(let i=0;i<7;i++){const d=new Date(m);d.setDate(m.getDate()+i);const st=slot(d),on=st!=='Descanso';html+='<div class="day '+(sod(d).getTime()===today?'now':'')+'"><div class="name">'+NS[ORDER[i]]+'</div><div class="num">'+d.getDate()+'</div>'+(on?'<div class="shift">'+st+'</div>':'<div class="off">Descanso</div>')+'</div>'}document.getElementById('grid').innerHTML=html;const su=new Date(m);su.setDate(m.getDate()+6);document.getElementById('foot').textContent='Rango: '+short(m)+' - '+short(su)+' · Anclaje fijo: 27 abril 2026 · ciclo automatico de 2 semanas.'}
+render();setInterval(render,60000);
+</script>
+</body>
+</html>
